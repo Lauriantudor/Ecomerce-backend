@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username String
+  email     String   @unique
+  password  String
+  role      String   @default("customer")
+  orders Order[]
+  address Address[]
+  cart Cart?
+  refreshToken String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Address{
+  id Int @id @default(autoincrement())
+  title String @default("Home")
+  fullName String
+  phoneNumber String
+  city String
+  county String
+  country String
+  streetAddress String
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+  orders Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String @unique
+  products Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  price       Float
+  stock       Int      @default(0)
+  imageUrl    String?
+  altImage    String?
+  categoryId Int
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  items       OrderItem[]
+  cartItems CartItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model Order{
+  id Int @id @default(autoincrement())
+  totalAmount Float
+  status String
+  userId Int
+  user User  @relation(fields: [userId],references: [id])
+  addressId Int
+  address Address @relation(fields: [addressId], references: [id])
+  items OrderItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model OrderItem{
+  id Int @id @default(autoincrement())
+  orderId Int
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  quantity Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+}
+model Cart{
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  user User @relation(fields: [userId],references: [id])
+  items CartItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model CartItem{
+  id Int @id @default(autoincrement())
+  cartId  Int
+  cart Cart @relation(fields: [cartId],references: [id])
+  productId Int
+  product Product @relation(fields: [productId],references: [id])
+  quantity Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}

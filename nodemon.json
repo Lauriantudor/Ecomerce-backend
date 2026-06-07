@@ -1,0 +1,7 @@
+{
+  "watch": ["app.ts", "src", "generated/prisma"],
+  "ignore": ["dist/**", "node_modules/**"],
+  "ext": "ts,js",
+  "delay": "2000",
+  "exec": "npm run start"
+}

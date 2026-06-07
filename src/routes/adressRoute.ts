@@ -1,0 +1,46 @@
+import { Router } from "express";
+import addressController from "../controllers/addressController.ts";
+import authMiddleware from "../middlewares/authMiddleware.ts";
+
+const router = Router();
+
+router.post(
+  "/",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("customer"),
+  addressController.createAddrees,
+);
+router.get(
+  "/",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("customer"),
+  addressController.getUserAddresses,
+);
+router.put(
+  "/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("customer"),
+  addressController.updateAddress,
+);
+
+router.get(
+  "/admin/all",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("admin"),
+  addressController.adminGetAllAddresses,
+);
+router.get(
+  "/admin/user/:userId",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("admin"),
+  addressController.adminGetAddressesByUserId,
+);
+
+router.delete(
+  "/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("admin", "customer"),
+  addressController.deleteAddress,
+);
+
+export default router;
