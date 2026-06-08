@@ -83,15 +83,49 @@ const getProductById = async (req: Request, res: Response) => {
 // READ ALL
 const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await prisma.product.findMany({
-      include: { category: true },
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 0;
+    const catregoryId = req.query.categoryId
+      ? Number(req.query.categoryId)
+      : undefined;
+
+    const skip = (page - 1) * limit;
+
+    const whereClause: any = {};
+    if (catregoryId) {
+      whereClause.catregoryId = catregoryId;
+    }
+
+    const [products, totalProducts] = await prisma.$transaction([
+      prisma.product.findMany({
+        where: whereClause,
+        skip: skip,
+        take: limit,
+        include: {
+          category: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      prisma.product.count({
+        where: whereClause,
+      }),
+    ]);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    return res.status(200).json({
+      products,
+      meta: {
+        totalProducts,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
     });
-    return res.status(200).json(products);
-  } catch (error: any) {
-    return res.status(400).json({
-      message: "Error retrieving products",
-      error: error.message,
-    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

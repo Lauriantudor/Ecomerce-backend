@@ -22,5 +22,10 @@ router.get(
   authMiddleware.checkRole("admin"),
   orderController.getAllOrders,
 );
-
+router.put(
+  "/admin/:id/status",
+  authMiddleware.verifyToken,
+  authMiddleware.checkRole("admin"),
+  orderController.updateOrderStatus,
+);
 export default router;

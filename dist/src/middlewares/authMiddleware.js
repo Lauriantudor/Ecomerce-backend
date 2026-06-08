@@ -16,9 +16,6 @@ const verifyToken = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, ACCESS_SECRET);
         req.user = decoded;
-        // ========================================================
-        // 🔍 AICI PUNEM LOGICA PENTRU EXPIRARE (EXPIRATION TOKEN)
-        // ========================================================
         if (decoded && decoded.exp) {
             const timestampCurent = Math.floor(Date.now() / 1000); // Timpul actual în secunde
             const timpRamasSecunde = decoded.exp - timestampCurent;
@@ -34,7 +31,6 @@ const verifyToken = (req, res, next) => {
             }
             console.log("========================================================");
         }
-        // ========================================================
         next();
     }
     catch (error) {
@@ -43,14 +39,14 @@ const verifyToken = (req, res, next) => {
         });
     }
 };
-const checkRole = (allowRole) => {
+const checkRole = (...allowRoles) => {
     return (req, res, next) => {
         if (!req.user) {
             return res.status(403).json({
                 error: "Unauthenticated user.",
             });
         }
-        if (req.user.role !== allowRole) {
+        if (!allowRoles.includes(req.user.role)) {
             return res.status(403).json({
                 error: "Forbidden. Insufficient permissions.",
             });
