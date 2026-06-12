@@ -106,3 +106,12 @@ model CartItem{
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String?  // Semnul întrebării înseamnă opțional
+  message   String
+  isRead    Boolean  @default(false) // Util pentru admin ca să știe ce a citit
+  createdAt DateTime @default(now())
+}

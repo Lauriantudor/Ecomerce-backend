@@ -7,6 +7,7 @@ import productRouter from "./src/routes/productRoute.ts";
 import cartRouter from "./src/routes/cartRoute.ts";
 import orderRouter from "./src/routes/orderRoute.ts";
 import addressRouter from "./src/routes/adressRoute.ts";
+import contactMessageRouter from "./src/routes/contactMessageRoute.ts";
 
 import path from "path";
 
@@ -21,6 +22,7 @@ app.use("/products", productRouter);
 app.use("/cart", cartRouter);
 app.use("/orders", orderRouter);
 app.use("/addresses", addressRouter);
+app.use("/contact-mesage", contactMessageRouter);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.listen(PORT, () => {

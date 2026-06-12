@@ -156,9 +156,41 @@ const getAllOrders = async (req, res) => {
         });
     }
 };
+// STATUS OF ORDER
+const updateOrderStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const validStatuses = ["pending", "shipped", "delivered", "cancelled"];
+    if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({
+            message: `Invalid status. Choose between: ${validStatuses.join(", ")}`,
+        });
+    }
+    try {
+        const orderExists = await prisma.order.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!orderExists) {
+            return res.status(404).json({ message: "Order not found." });
+        }
+        const updatedOrder = await prisma.order.update({
+            where: { id: Number(id) },
+            data: { status },
+        });
+        return res.status(200).json({
+            message: `Order status updated to ${status}!`,
+            order: updatedOrder,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
 const orderController = {
     createOrder,
     gerUserOrder,
     getAllOrders,
+    updateOrderStatus,
 };
 export default orderController;
